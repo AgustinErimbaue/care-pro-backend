@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const ObjectId = mongoose.SchemaTypes.ObjectId;
 
 const UserSchema = new mongoose.Schema(
   {
@@ -8,6 +9,8 @@ const UserSchema = new mongoose.Schema(
     fullName: { type: String, required: true },
     phoneNumber: { type: String },
     address: { type: String },
+    tokens: [],
+    services: [{ type: ObjectId, ref: "Service" }],
     isServiceProvider: { type: Boolean, default: false },
   },
   { timestamps: true }

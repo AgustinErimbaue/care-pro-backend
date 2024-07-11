@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const { jwt_secret } = require("../config/keys");
 
 const UserController = {
   async create(req, res) {
@@ -9,7 +11,19 @@ const UserController = {
       console.error(error);
       res
         .status(500)
-        .send({ message: "Ha habido un problema al crear el producto" });
+        .send({ message: "Ha habido un problema al crear el usuario" });
+    }
+  },
+  async login(req, res) {
+    try {
+      const user = await User.findOne({ email: req.body.email });
+      const token = jwt.sign({ _id: user._id }, jwt_secret);
+      if (user.tokens.length > 4) user.tokens.shift();
+      user.tokens.push(token);
+      await user.save();
+      res.send({ message: `Bienveid@ ${user.username}, ${token}` });
+    } catch (error) {
+      console.error(error);
     }
   },
   async getAllUsers(req, res) {
@@ -20,7 +34,7 @@ const UserController = {
       console.error(error);
     }
   },
-  async getUserByid(req, res) {
+  async getUserById(req, res) {
     try {
       const user = await User.findById(req.params._id);
       res.send(user);

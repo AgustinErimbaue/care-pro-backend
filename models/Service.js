@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const { ObjectId } = require('mongoose');
-const User = require('./User');
+const ObjectId = mongoose.SchemaTypes.ObjectId;
 
 const ServiceSchema = new mongoose.Schema(
   {
