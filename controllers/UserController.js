@@ -67,9 +67,26 @@ const UserController = {
       await User.findByIdAndUpdate(req.user._id, {
         $pull: { tokens: req.headers.authorization },
       });
-      res.send({ message: "Desconectado con extito" });
+      res.send({ message: "Desconectado con exito" });
     } catch (error) {
-      res.status(500).send({message:"Hubno un problema la intentar desconectar al usuario"})
+      res
+        .status(500)
+        .send({
+          message: "Hubno un problema la intentar desconectar al usuario",
+        });
+    }
+  },
+  async updateUser(req, res) {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.user._id,
+        req.body,
+        { new: true }
+      );
+      res.send(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Hubo un problema al actualizar el usuario" });
     }
   },
 };
