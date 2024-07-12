@@ -62,5 +62,15 @@ const UserController = {
       console.error(error);
     }
   },
+  async logout(req, res) {
+    try {
+      await User.findByIdAndUpdate(req.user._id, {
+        $pull: { tokens: req.headers.authorization },
+      });
+      res.send({ message: "Desconectado con extito" });
+    } catch (error) {
+      res.status(500).send({message:"Hubno un problema la intentar desconectar al usuario"})
+    }
+  },
 };
 module.exports = UserController;
