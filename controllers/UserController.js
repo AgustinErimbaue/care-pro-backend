@@ -1,11 +1,13 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { jwt_secret } = require("../config/keys");
+const bcrypt = require("bcrypt");
 
 const UserController = {
   async create(req, res) {
     try {
-      const user = await User.create(req.body);
+      const password = await bcrypt.hash(req.body.password, 10);
+      const user = await User.create({ ...req.body, password });
       res.status(201).send(user);
     } catch (error) {
       console.error(error);
@@ -18,6 +20,25 @@ const UserController = {
     try {
       const user = await User.findOne({ email: req.body.email });
       const token = jwt.sign({ _id: user._id }, jwt_secret);
+      if (!user) {
+        returnres
+          .status(400)
+          .send({ message: "Correo o contraseña incorrecta" });
+      }
+      if (
+        !req.body.password ||
+        !bcrypt.compareSync(req.body.password, user.password)
+      ) {
+        console.log(
+          "holaaa : ",
+          req.body.password +
+            " | " +
+            user.password +
+            " | " +
+            bcrypt.compareSync(req.body.password, user.password)
+        );
+        return res.status(400).send("Invalid email or password");
+      }
       if (user.tokens.length > 4) user.tokens.shift();
       user.tokens.push(token);
       await user.save();
@@ -69,24 +90,22 @@ const UserController = {
       });
       res.send({ message: "Desconectado con exito" });
     } catch (error) {
-      res
-        .status(500)
-        .send({
-          message: "Hubno un problema la intentar desconectar al usuario",
-        });
+      res.status(500).send({
+        message: "Hubno un problema la intentar desconectar al usuario",
+      });
     }
   },
   async updateUser(req, res) {
     try {
-      const user = await User.findByIdAndUpdate(
-        req.user._id,
-        req.body,
-        { new: true }
-      );
+      const user = await User.findByIdAndUpdate(req.user._id, req.body, {
+        new: true,
+      });
       res.send(user);
     } catch (error) {
       console.error(error);
-      res.status(500).send({ message: "Hubo un problema al actualizar el usuario" });
+      res
+        .status(500)
+        .send({ message: "Hubo un problema al actualizar el usuario" });
     }
   },
 };

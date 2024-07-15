@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema(
     tokens: [],
     services: [{ type: ObjectId, ref: "Service" }],
     isServiceProvider: { type: Boolean, default: false },
+    confirmed: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

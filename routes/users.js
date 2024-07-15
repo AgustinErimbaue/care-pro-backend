@@ -12,4 +12,4 @@ router.delete("/id/:_id",authentication, UserController.deleteUser);
 router.delete("/logout",authentication, UserController.logout);
 router.put("/update/:_id",authentication, UserController.updateUser);
 
-module.exports = router;
+module.exports = router; 
