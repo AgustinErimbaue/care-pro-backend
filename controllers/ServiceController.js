@@ -10,7 +10,7 @@ const ServiceController = {
         ...req.body,
         provider: req.user._id,
       });
-      
+
       // Actualizar el usuario para incluir el nuevo servicio
       const user = await User.findById(req.user._id);
       user.services.push(service._id);
@@ -20,6 +20,21 @@ const ServiceController = {
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: "Error al crear el servicio" });
+    }
+  },
+  async updateService(req, res) {
+    try {
+      const service = await Service.findByIdAndUpdate(
+        req.service._id,
+        { ...req.body, provider: req.user._id },
+        { new: true }
+      );
+      res.send(service);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ message: "Hubo un problema al actualizar el servicio" });
     }
   },
 };
