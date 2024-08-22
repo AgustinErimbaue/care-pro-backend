@@ -19,32 +19,35 @@ const UserController = {
   async login(req, res) {
     try {
       const user = await User.findOne({ email: req.body.email });
-      const token = jwt.sign({ _id: user._id }, jwt_secret);
+
+      // Verifica si el usuario existe
       if (!user) {
-        returnres
+        return res
           .status(400)
           .send({ message: "Correo o contraseña incorrecta" });
       }
+
+      // Verifica si la contraseña es correcta
       if (
         !req.body.password ||
         !bcrypt.compareSync(req.body.password, user.password)
       ) {
-        console.log(
-          "holaaa : ",
-          req.body.password +
-            " | " +
-            user.password +
-            " | " +
-            bcrypt.compareSync(req.body.password, user.password)
-        );
-        return res.status(400).send("Invalid email or password");
+        return res
+          .status(400)
+          .send({ message: "Correo o contraseña incorrecta" });
       }
+
+      // Genera y guarda el token
+      const token = jwt.sign({ _id: user._id }, jwt_secret);
       if (user.tokens.length > 4) user.tokens.shift();
       user.tokens.push(token);
       await user.save();
-      res.send({ message: `Bienveid@ ${user.username}, ${token}` });
+
+      // Envía una respuesta exitosa
+      res.send({ user: user.username, token: token });
     } catch (error) {
       console.error(error);
+      res.status(500).send({ message: "Error en el servidor" });
     }
   },
   async getAllUsers(req, res) {
