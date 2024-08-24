@@ -6,7 +6,7 @@ const { authentication } = require("../middleware/authentication");
 
 router.get("/users",authentication, UserController.getAllUsers);
 router.get("/id/:_id",authentication, UserController.getUserById);
-router.get("/name/:username",authentication, UserController.getUserByName);
+router.get("/name/:name",authentication, UserController.getUserByName);
 router.post("/", UserController.create);
 router.post("/login", UserController.login);
 router.delete("/delete", authentication, UserController.deleteUser);

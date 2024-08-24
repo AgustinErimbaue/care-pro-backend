@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema(
     repeatPassword: { type: String, required: true },
     phoneNumber: { type: String },
     address: { type: String },
+    username: { type: String, required: true, unique: true },
     tokens: [],
     services: [{ type: ObjectId, ref: "Service" }],
     isServiceProvider: { type: Boolean, default: false },
@@ -18,7 +19,7 @@ const UserSchema = new mongoose.Schema(
 );
 
 UserSchema.index({
-  username: "text",
+  usernamename: "text",
 });
 
 const User = mongoose.model("User", UserSchema);

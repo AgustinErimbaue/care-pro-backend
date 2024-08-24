@@ -20,14 +20,12 @@ const UserController = {
     try {
       const user = await User.findOne({ email: req.body.email });
 
-      // Verifica si el usuario existe
       if (!user) {
         return res
           .status(400)
           .send({ message: "Correo o contraseña incorrecta" });
       }
 
-      // Verifica si la contraseña es correcta
       if (
         !req.body.password ||
         !bcrypt.compareSync(req.body.password, user.password)
@@ -37,14 +35,12 @@ const UserController = {
           .send({ message: "Correo o contraseña incorrecta" });
       }
 
-      // Genera y guarda el token
       const token = jwt.sign({ _id: user._id }, jwt_secret);
       if (user.tokens.length > 4) user.tokens.shift();
       user.tokens.push(token);
       await user.save();
 
-      // Envía una respuesta exitosa
-      res.send({ user: user.username, token: token });
+      res.send({ user: user.name, token: token });
     } catch (error) {
       console.error(error);
       res.status(500).send({ message: "Error en el servidor" });
@@ -70,7 +66,7 @@ const UserController = {
     try {
       const user = await User.find({
         $text: {
-          $search: req.params.username,
+          $search: req.params.usname,
         },
       });
       res.send(user);
