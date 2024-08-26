@@ -16,7 +16,6 @@ const UserController = {
         .send({ message: "Ha habido un problema al crear el usuario" });
     }
   },
-  // Método de Login en el Backend
   async login(req, res) {
     try {
       const user = await User.findOne({ email: req.body.email });
@@ -37,10 +36,8 @@ const UserController = {
           .send({ message: "Correo o contraseña incorrecta" });
       }
 
-      // Genera el token
       const token = jwt.sign({ _id: user._id }, jwt_secret);
 
-      // Maneja el límite de tokens
       if (user.tokens.length > 4) {
         user.tokens.shift();
       }
@@ -48,9 +45,8 @@ const UserController = {
       user.tokens.push(token);
       await user.save();
 
-      // Enviar el objeto user con las propiedades necesarias y el token
       res.send({
-        user: { _id: user._id, name: user.name, email: user.email }, // Agrega las propiedades que necesitas
+        user: { _id: user._id, name: user.name, email: user.email }, 
         token: token,
       });
     } catch (error) {
@@ -69,9 +65,13 @@ const UserController = {
   async getUserById(req, res) {
     try {
       const user = await User.findById(req.params._id);
-      res.send(user);
+      if (!user) {
+        return res.status(404).send({ message: "Usuario no encontrado" });
+      }
+      res.send(user); 
     } catch (error) {
       console.error(error);
+      res.status(500).send({ message: "Error en el servidor" });
     }
   },
   async getUserByName(req, res) {
