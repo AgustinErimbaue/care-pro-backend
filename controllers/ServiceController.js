@@ -37,6 +37,19 @@ const ServiceController = {
         .send({ message: "Hubo un problema al actualizar el servicio" });
     }
   },
+  async getUserServices(req, res) {
+    try {
+      // Buscar los servicios donde el proveedor es el usuario autenticado
+      const services = await Service.find({ provider: req.user._id });
+
+      res.send(services);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ error: "Error al obtener los servicios del usuario" });
+    }
+  },
 };
 
 module.exports = ServiceController;
