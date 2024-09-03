@@ -39,10 +39,9 @@ const ServiceController = {
   },
   async getUserServices(req, res) {
     try {
-      // Buscar los servicios donde el proveedor es el usuario autenticado
       const services = await Service.find({ provider: req.user._id });
 
-      res.send(services);
+      res.status(200).send(services);
     } catch (error) {
       console.error(error);
       res
