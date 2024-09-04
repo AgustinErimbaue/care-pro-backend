@@ -4,7 +4,7 @@ const router = express.Router();
 const { authentication } = require("../middleware/authentication");
 
 router.get("/service",authentication, ServiceController.getUserServices);
-router.get("allService", authentication,ServiceController.getAllServices)
+router.get("/allService", authentication,ServiceController.getAllServices)
 router.post("/", authentication, ServiceController.create);
 router.put("/updateService", authentication, ServiceController.updateService);
 
