@@ -49,6 +49,15 @@ const ServiceController = {
         .send({ error: "Error al obtener los servicios del usuario" });
     }
   },
+
+  async getAllService(req, res) {
+    try {
+      const services = await Service.find();
+      res.send(services);
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 module.exports = ServiceController;
