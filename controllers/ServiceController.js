@@ -50,7 +50,7 @@ const ServiceController = {
     }
   },
 
-  async getAllService(req, res) {
+  async getAllServices(req, res) {
     try {
       const services = await Service.find();
       res.send(services);
