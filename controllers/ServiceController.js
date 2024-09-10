@@ -24,17 +24,20 @@ const ServiceController = {
   },
   async updateService(req, res) {
     try {
-      const service = await Service.findByIdAndUpdate(
-        req.service._id,
+      const updatedService = await Service.findByIdAndUpdate(
+        req.params._id,
         { ...req.body, provider: req.user._id },
-        { new: true }
+        { new: true, runValidators: true }
       );
-      res.send(service);
+
+      if (!updatedService) {
+        return res.status(400).json({ message: "Error updating service" });
+      }
+
+      res.status(200).json(updatedService);
     } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .send({ message: "Hubo un problema al actualizar el servicio" });
+      console.error("Error al actualizar el servicio:", error); // Muestra el error exacto
+      res.status(500).json({ message: "Error del servidor" });
     }
   },
   async getUserServices(req, res) {
@@ -56,6 +59,16 @@ const ServiceController = {
       res.send(services);
     } catch (error) {
       console.error(error);
+    }
+  },
+
+  async deleteService(req, res) {
+    try {
+      await Service.findByIdAndDelete(req.params._id);
+      res.send({ message: `Servicio eliminado` });
+    } catch (error) {
+      console.error(error);
+      res.status(500)
     }
   },
 };

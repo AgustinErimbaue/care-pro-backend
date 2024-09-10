@@ -6,6 +6,6 @@ const { authentication } = require("../middleware/authentication");
 router.get("/service",authentication, ServiceController.getUserServices);
 router.get("/allServices", authentication,ServiceController.getAllServices)
 router.post("/", authentication, ServiceController.create);
-router.put("/updateService", authentication, ServiceController.updateService);
+router.put("/updateService/:_id", authentication, ServiceController.updateService);
 
 module.exports = router;
