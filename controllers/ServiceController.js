@@ -36,7 +36,7 @@ const ServiceController = {
 
       res.status(200).json(updatedService);
     } catch (error) {
-      console.error("Error al actualizar el servicio:", error); // Muestra el error exacto
+      console.error("Error al actualizar el servicio:", error);
       res.status(500).json({ message: "Error del servidor" });
     }
   },
@@ -64,11 +64,24 @@ const ServiceController = {
 
   async deleteService(req, res) {
     try {
-      await Service.findByIdAndDelete(req.params._id);
-      res.send({ message: `Servicio eliminado` });
+      const service = await Service.findByIdAndDelete(req.params._id);
+
+      if (!service) {
+        return res.status(404).send({ message: "Servicio no encontrado" });
+      }
+
+      const user = await User.findOne({ services: service._id });
+      if (user) {
+        user.services = user.services.filter(
+          (serviceId) => serviceId.toString() !== service._id.toString()
+        );
+        await user.save();
+      }
+
+      res.send({ message: "Servicio eliminado correctamente" });
     } catch (error) {
       console.error(error);
-      res.status(500)
+      res.status(500).send({ message: "Error al eliminar el servicio" });
     }
   },
 };
