@@ -29,3 +29,5 @@ const ContractController = {
     }
   },
 };
+
+module.exports = ContractController;
