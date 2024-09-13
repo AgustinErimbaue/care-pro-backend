@@ -12,5 +12,5 @@ dbConnection();
 app.use("/users", require("./routes/users"));
 app.use("/services", require("./routes/services"));
 app.use("/messages", require("./routes/messages"));
-
+app.use("/contracts", require("./routes/contracts"));
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
