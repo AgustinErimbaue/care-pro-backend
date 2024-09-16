@@ -1,20 +1,25 @@
 const mongoose = require("mongoose");
+const ObjectId = mongoose.SchemaTypes.ObjectId;
 
 const UserSchema = new mongoose.Schema(
   {
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    fullName: { type: String, required: true },
+    password: { type: String, required: true },
     phoneNumber: { type: String },
     address: { type: String },
+    username: { type: String, required: true, unique: true },
+    tokens: [],
+    services: [{ type: ObjectId, ref: "Service" }],
+    contracts: [{ type: ObjectId, ref: "Contract" }],
     isServiceProvider: { type: Boolean, default: false },
+    confirmed: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
 UserSchema.index({
-  username: "text",
+  usernamename: "text",
 });
 
 const User = mongoose.model("User", UserSchema);
