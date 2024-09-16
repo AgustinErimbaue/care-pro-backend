@@ -11,6 +11,7 @@ const UserSchema = new mongoose.Schema(
     username: { type: String, required: true, unique: true },
     tokens: [],
     services: [{ type: ObjectId, ref: "Service" }],
+    contracts: [{ type: ObjectId, ref: "Contract" }],
     isServiceProvider: { type: Boolean, default: false },
     confirmed: { type: Boolean, default: false },
   },
