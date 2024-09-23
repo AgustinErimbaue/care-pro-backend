@@ -38,11 +38,10 @@ const ContractController = {
   },
   async getUserProfile(req, res) {
     try {
-      
       const user = await User.findById(req.user.id).populate({
-        path: "contracts", 
+        path: "contracts",
         populate: {
-          path: "service", 
+          path: "service",
           model: "Service",
         },
       });
@@ -51,7 +50,10 @@ const ContractController = {
         return res.status(404).json({ message: "Usuario no encontrado" });
       }
 
-      res.json(user);
+      res.json({
+        profile: user,
+        contracts: user.contracts,
+      });
     } catch (error) {
       res
         .status(500)
