@@ -46,7 +46,7 @@ const UserController = {
       await user.save();
 
       res.send({
-        user: { _id: user._id, name: user.name, email: user.email }, 
+        user: { _id: user._id, name: user.name, email: user.email },
         token: token,
       });
     } catch (error) {
@@ -68,7 +68,7 @@ const UserController = {
       if (!user) {
         return res.status(404).send({ message: "Usuario no encontrado" });
       }
-      res.send(user); 
+      res.send(user);
     } catch (error) {
       console.error(error);
       res.status(500).send({ message: "Error en el servidor" });
@@ -123,6 +123,24 @@ const UserController = {
       res
         .status(500)
         .send({ message: "Hubo un problema al actualizar el usuario" });
+    }
+  },
+  async uploadProfileImage(req, res) {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) return res.status(404).send("Usuario no encontrado");
+
+      user.profileImage = req.file.path;
+      await user.save();
+
+      res
+        .status(200)
+        .json({
+          message: "Imagen de perfil actualizada",
+          profileImage: req.file.path,
+        });
+    } catch (error) {
+      res.status(500).json({ error: "Error al subir la imagen de perfil" });
     }
   },
 };
