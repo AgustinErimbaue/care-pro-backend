@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema(
     phoneNumber: { type: String },
     address: { type: String },
     username: { type: String, required: true, unique: true },
+    profileImage: { type: String },  // Campo para la imagen de perfil
     tokens: [],
     services: [{ type: ObjectId, ref: "Service" }],
     contracts: [{ type: ObjectId, ref: "Contract" }],
