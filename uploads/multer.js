@@ -3,10 +3,10 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Asegúrate de que esta carpeta existe en el raíz del proyecto
+    cb(null, "uploads/"); 
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Nombre único
+    cb(null, Date.now() + path.extname(file.originalname)); 
   },
 });
 
