@@ -19,7 +19,9 @@ const upload = multer({
   limits: { fileSize: 1024 * 1024 * 5 }, // Límite de 5MB
   fileFilter: (req, file, cb) => {
     const fileTypes = /jpeg|jpg|png/;
-    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = fileTypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
     const mimetype = fileTypes.test(file.mimetype);
 
     if (extname && mimetype) {
@@ -38,8 +40,14 @@ router.get("/name/:name", authentication, UserController.getUserByName);
 router.post("/", UserController.create);
 router.post("/login", UserController.login);
 router.delete("/delete", authentication, UserController.deleteUser);
-router.post("/logout", authentication, UserController.logout);
+router.delete("/logout", authentication, UserController.logout);
 router.put("/update", authentication, UserController.updateUser);
-router.put("/upload-profile-image", authentication, upload.single('profileImage'), UserController.uploadProfileImage);
+router.put(
+  "/upload-profile-image",
+  authentication,
+  upload.single("profileImage"),
+  UserController.uploadProfileImage
+);
+router.get("/confirm/:emailToken", UserController.confirm);
 
 module.exports = router;

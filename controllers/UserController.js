@@ -2,31 +2,61 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { jwt_secret } = require("../config/keys");
 const bcrypt = require("bcrypt");
+const transporter = require("../config/nodemailer");
 
 const UserController = {
   async create(req, res) {
     try {
       const password = await bcrypt.hash(req.body.password, 10);
+
       const user = await User.create({ ...req.body, password });
-      res.status(201).send(user);
-    } catch (error) {
-      console.error(error);
+
+      const emailToken = jwt.sign({ email: req.body.email }, jwt_secret);
+
+      const url = `http://localhost:8080/users/confirm/` + emailToken;
+
+      await transporter.sendMail({
+        to: req.body.email,
+        subject: "Confirme su registro",
+        html: `<h3>Bienvenido, estás a un paso de registrarte</h3>
+               <a href="${url}">Clica para confirmar tu registro</a>`,
+      });
+
+      res.status(201).send({
+        message: "Te hemos enviado un correo para confirmar el registro",
+        user,
+      });
+    } catch (err) {
+      console.error(err);
       res
         .status(500)
-        .send({ message: "Ha habido un problema al crear el usuario" });
+        .send({ message: "Error en el servidor al crear usuario" });
     }
   },
-  
+
   async login(req, res) {
     try {
       const user = await User.findOne({ email: req.body.email });
       if (!user) {
-        return res.status(400).send({ message: "Correo o contraseña incorrecta" });
+        return res
+          .status(400)
+          .send({ message: "Correo o contraseña incorrecta" });
       }
 
-      const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
+      const isPasswordValid = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
       if (!isPasswordValid) {
-        return res.status(400).send({ message: "Correo o contraseña incorrecta" });
+        return res
+          .status(400)
+          .send({ message: "Correo o contraseña incorrecta" });
+      }
+
+      if (!user.confirmed) {
+        return res.status(403).send({
+          message: "Cuenta no confirmada. Por favor, verifica tu correo.",
+        });
       }
 
       const token = jwt.sign({ _id: user._id }, jwt_secret);
@@ -47,7 +77,7 @@ const UserController = {
       res.status(500).send({ message: "Error en el servidor" });
     }
   },
-  
+
   async getAllUsers(req, res) {
     try {
       const users = await User.find();
@@ -57,7 +87,7 @@ const UserController = {
       res.status(500).send({ message: "Error en el servidor" });
     }
   },
-  
+
   async getUserById(req, res) {
     try {
       const user = await User.findById(req.params._id);
@@ -70,11 +100,11 @@ const UserController = {
       res.status(500).send({ message: "Error en el servidor" });
     }
   },
-  
+
   async getUserByName(req, res) {
     try {
       const user = await User.find({
-        name: new RegExp(req.params.name, 'i'),
+        name: new RegExp(req.params.name, "i"),
       });
       res.send(user);
     } catch (error) {
@@ -82,7 +112,7 @@ const UserController = {
       res.status(500).send({ message: "Error en el servidor" });
     }
   },
-  
+
   async deleteUser(req, res) {
     try {
       const user = await User.findByIdAndDelete(req.user._id);
@@ -92,10 +122,12 @@ const UserController = {
       res.send({ message: "Usuario eliminado correctamente", user });
     } catch (error) {
       console.error(error);
-      res.status(500).send({ message: "Hubo un problema al eliminar el usuario" });
+      res
+        .status(500)
+        .send({ message: "Hubo un problema al eliminar el usuario" });
     }
   },
-  
+
   async logout(req, res) {
     try {
       await User.findByIdAndUpdate(req.user._id, {
@@ -108,7 +140,7 @@ const UserController = {
       });
     }
   },
-  
+
   async updateUser(req, res) {
     try {
       const user = await User.findByIdAndUpdate(req.user._id, req.body, {
@@ -117,17 +149,22 @@ const UserController = {
       res.send(user);
     } catch (error) {
       console.error(error);
-      res.status(500).send({ message: "Hubo un problema al actualizar el usuario" });
+      res
+        .status(500)
+        .send({ message: "Hubo un problema al actualizar el usuario" });
     }
   },
-  
+
   async uploadProfileImage(req, res) {
     try {
       const user = await User.findById(req.user._id);
-      if (!user) return res.status(404).send({ message: "Usuario no encontrado" });
+      if (!user)
+        return res.status(404).send({ message: "Usuario no encontrado" });
 
       if (!req.file) {
-        return res.status(400).send({ message: "No se ha proporcionado ninguna imagen" });
+        return res
+          .status(400)
+          .send({ message: "No se ha proporcionado ninguna imagen" });
       }
 
       user.profileImage = req.file.path;
@@ -140,6 +177,29 @@ const UserController = {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Error al subir la imagen de perfil" });
+    }
+  },
+  async confirm(req, res) {
+    try {
+      const token = req.params.emailToken;
+
+      const payload = jwt.verify(token, jwt_secret);
+
+      const user = await User.findOneAndUpdate(
+        { email: payload.email },
+        { confirmed: true },
+        { new: true }
+      );
+
+      if (!user) {
+        return res.status(404).send({ message: "Usuario no encontrado" });
+      }
+
+
+      res.status(200).send("Usuario confirmado con éxito");
+    } catch (error) {
+      console.error("Error en confirmación:", error);
+      res.status(500).send({ message: "Error al confirmar el usuario" });
     }
   },
 };
