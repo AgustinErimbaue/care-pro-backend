@@ -17,9 +17,17 @@ const UserController = {
 
       await transporter.sendMail({
         to: req.body.email,
-        subject: "Confirme su registro",
-        html: `<h3>Bienvenido, estás a un paso de registrarte</h3>
-               <a href="${url}">Clica para confirmar tu registro</a>`,
+        subject: "Confirmación de Registro en Care-Pro",
+        html: `
+          <h2>¡Gracias por unirte a Care-Pro!</h2>
+          <p>Estimado/a usuario/a,</p>
+          <p>Estamos encantados de darte la bienvenida a nuestra plataforma. Para completar tu registro, por favor haz clic en el enlace a continuación:</p>
+          <p><a href="${url}" style="color: #007bff; text-decoration: none;">Confirmar mi cuenta</a></p>
+          <p>Si no solicitaste este registro, simplemente ignora este correo.</p>
+          <p>Atentamente,<br>El equipo de Care-Pro</p>
+          <hr>
+          <small>Este correo fue enviado automáticamente. Por favor, no respondas a este mensaje.</small>
+        `,
       });
 
       res.status(201).send({
@@ -194,7 +202,6 @@ const UserController = {
       if (!user) {
         return res.status(404).send({ message: "Usuario no encontrado" });
       }
-
 
       res.status(200).send("Usuario confirmado con éxito");
     } catch (error) {
