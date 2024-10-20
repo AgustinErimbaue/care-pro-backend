@@ -1,4 +1,8 @@
 node_modules
 keys.js
+<<<<<<< HEAD
 nodemailer.js
+=======
+nodemailer.js\
+>>>>>>> f0ff5e4689aaa14c709798906900e5b57847acd3
 .env
