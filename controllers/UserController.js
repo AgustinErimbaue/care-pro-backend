@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-require('dotenv').config()
-const { jwt_secret } = process.env
+require('dotenv').config();
+const { JWT_SECRET: jwt_secret } = process.env;
 const bcrypt = require("bcrypt");
 const transporter = require("../config/nodemailer");
 
@@ -51,7 +51,7 @@ const UserController = {
           .status(400)
           .send({ message: "Correo o contraseña incorrecta" });
       }
-
+  
       const isPasswordValid = await bcrypt.compare(
         req.body.password,
         user.password
@@ -61,22 +61,22 @@ const UserController = {
           .status(400)
           .send({ message: "Correo o contraseña incorrecta" });
       }
-
+  
       if (!user.confirmed) {
         return res.status(403).send({
           message: "Cuenta no confirmada. Por favor, verifica tu correo.",
         });
       }
-
-      const token = jwt.sign({ _id: user._id }, jwt_secret);
-
+  
+      const token = jwt.sign({ _id: user._id }, jwt_secret, { expiresIn: '1d' });
+  
       if (user.tokens.length > 4) {
         user.tokens.shift();
       }
-
+  
       user.tokens.push(token);
       await user.save();
-
+  
       res.send({
         user: { _id: user._id, name: user.name, email: user.email },
         token: token,
@@ -86,6 +86,7 @@ const UserController = {
       res.status(500).send({ message: "Error en el servidor" });
     }
   },
+  
 
   async getAllUsers(req, res) {
     try {
